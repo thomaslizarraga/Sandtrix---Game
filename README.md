@@ -1,3 +1,4 @@
 # Sandtrix---Game
 
-Se requiere terminal linux SDL2
+Requisitos minimos para correr el juego: 
+1) Terminal Linux. Ejecutar comando "./sandtrix"
