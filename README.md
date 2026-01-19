@@ -9,9 +9,9 @@ gráfica SDL2.
 Las piezas (tetrominós) caen una por una desde la parte superior del tablero.
 Mientras la pieza está en caída, el jugador puede:
 
--Rotarla.
--Moverla a la izquierda o derecha.
--Acelerar su caída.
+- Rotarla.
+- Moverla a la izquierda o derecha.
+- Acelerar su caída.
 
 Cuando la pieza toca la arena, cada uno de sus píxeles se convierte en un grano
 de arena y pasa a formar parte de la simulación.
@@ -24,10 +24,10 @@ El puntaje se calcula según la cantidad de píxeles eliminados.
 
 #Controles
 
-⬅️ Flecha izquierda: mover pieza a la izquierda
-➡️ Flecha derecha: mover pieza a la derecha
-⬇️ Flecha abajo: acelerar caída
-⬆️ Flecha arriba: rotar pieza
+- ⬅️ Flecha izquierda: mover pieza a la izquierda
+- ➡️ Flecha derecha: mover pieza a la derecha
+- ⬇️ Flecha abajo: acelerar caída
+- ⬆️ Flecha arriba: rotar pieza
 
 #Requisitos
 
@@ -36,8 +36,8 @@ El puntaje se calcula según la cantidad de píxeles eliminados.
 - Sistema Linux(Contar con una terminal Linux es suficiente) / Windows / macOS
 
 #Compilación y ejecución con los siguientes pasos:
-make
-./sandtrix
+- make
+- ./sandtrix
 
 Esta no es la versión final del juego, pero igualmente está completa. Iré actualizando el rendimiento de los códigos cada 
 vez que pueda.
