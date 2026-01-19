@@ -31,9 +31,9 @@ El puntaje se calcula según la cantidad de píxeles eliminados.
 
 #Requisitos
 
--Biblioteca Gráfica SDL2.
--Compilador C (gcc recomendado).
--Sistema Linux(Contar con una terminal Linux es suficiente) / Windows / macOS
+- Biblioteca Gráfica SDL2.
+- Compilador C (gcc recomendado).
+- Sistema Linux(Contar con una terminal Linux es suficiente) / Windows / macOS
 
 #Compilación y ejecución con los siguientes pasos:
 make
