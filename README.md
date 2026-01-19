@@ -24,10 +24,10 @@ El puntaje se calcula según la cantidad de píxeles eliminados.
 
 #Controles
 
-⬅️ Flecha izquierda: mover pieza a la izquierda.
-➡️ Flecha derecha: mover pieza a la derecha.
-⬇️ Flecha abajo: acelerar caída.
-⬆️ Flecha arriba: rotar pieza.
+⬅️ Flecha izquierda: mover pieza a la izquierda
+➡️ Flecha derecha: mover pieza a la derecha
+⬇️ Flecha abajo: acelerar caída
+⬆️ Flecha arriba: rotar pieza
 
 #Requisitos
 
