@@ -1,8 +1,5 @@
 #Sandtrix---Game
 
-Esta no es la versión final del juego, pero igualmente está completa. La última versión disponible se subirá a la brevedad e iré actualizando el rendimiento de los códigos cada 
-vez que pueda.
-
 Sandtrix es una implementación del clásico concepto de Tetris combinada con
 una simulación de arena, desarrollada en lenguaje C utilizando la biblioteca
 gráfica SDL2.
@@ -38,7 +35,10 @@ El puntaje se calcula según la cantidad de píxeles eliminados.
 -Compilador C (gcc recomendado).
 -Sistema Linux(Contar con una terminal Linux es suficiente) / Windows / macOS
 
-#Compilación y ejecución
-1) make
-2) ./sandtrix
+#Compilación y ejecución con los siguientes pasos:
+make
+./sandtrix
+
+Esta no es la versión final del juego, pero igualmente está completa. Iré actualizando el rendimiento de los códigos cada 
+vez que pueda.
 
