@@ -37,7 +37,7 @@ bool pieza_no_existe(imagen_t* t){
 
 void remover_linea(imagen_t* tablero, imagen_t* borrar, size_t alto, size_t ancho, unsigned int* contador_puntaje){
     for(size_t i = 0; i<alto; i++)
-        for(size_t j=0; j<ancho; j++)
+        for(size_t j = 0; j<ancho; j++)
             if( imagen_obtener_pixel(borrar,i,j) == 0xff) {
                 (*contador_puntaje)++;
                 imagen_establecer_pixel(tablero,i,j,0);
@@ -59,7 +59,7 @@ bool pieza_toca_arena(imagen_t* pieza, imagen_t* tablero, size_t fp, size_t cp){
     size_t alto  = imagen_alto(pieza);
     size_t ancho = imagen_ancho(pieza);
 
-    // 2) Recorrer todos los pixeles de la pieza para detectar colisión, pero desde la fila más baja.
+    // Recorrer todos los pixeles de la pieza para detectar colisión, pero desde la fila más baja.
     for(int i = (alto - 1); i >= 0; i--){
         for(int j = (ancho - 1) ; j >= 0; j--){
 
@@ -72,7 +72,7 @@ bool pieza_toca_arena(imagen_t* pieza, imagen_t* tablero, size_t fp, size_t cp){
             color_t abajo = imagen_obtener_pixel(tablero, fp + i + 1, cp + j);
 
             // Si lo de abajo NO es negro entonces chocó
-            if( (!color_es_negro(abajo)) || (fp + alto)==144){
+            if( (!color_es_negro(abajo)) || (fp + alto)>=144){
                 return true;
             }
         }
@@ -81,12 +81,12 @@ bool pieza_toca_arena(imagen_t* pieza, imagen_t* tablero, size_t fp, size_t cp){
     return false;
 }
 
-void simulacion_arena (imagen_t *tablero){
+void simulacion_arena(imagen_t *tablero){
     
     size_t ancho = imagen_ancho(tablero);
     size_t alto = imagen_alto(tablero);
     
-   imagen_t* tablero_nuevo = crear_tablero_negro();
+   imagen_t* tablero_nuevo = crear_tablero_negro(ALTO_TABLERO, ANCHO_TABLERO);
 
     //la ultima fila se copia tal cual está
     for(size_t i = 0; i < ancho; i++){
@@ -94,40 +94,39 @@ void simulacion_arena (imagen_t *tablero){
         imagen_establecer_pixel(tablero_nuevo, alto - 1, i, c);
     }
 
-
-    for(int i = alto - 2; i >= 0; i--){
-        for(size_t j = 0; j < ancho; j++){
+    for(int i = (int)alto - 2; i >= 0; i--){
+        for(size_t j = 0; j < (int)ancho; j++){
 
             color_t color_actual= imagen_obtener_pixel(tablero, i, j);
             if(color_es_negro(color_actual))
                 continue;
 
-            int r = rand () % 4;
+            int r = rand() % 4;
 
             if(r != 0){ //Se mantiene el color
                 imagen_establecer_pixel(tablero_nuevo, i, j, color_actual);
-                continue; //esta linea creo que no hace falta
             }
 
             //intenta mover abajo
-
-            else if( (i + 1) < alto && color_es_negro( imagen_obtener_pixel(tablero, i + 1, j) ) )
-                imagen_establecer_pixel(tablero_nuevo,i + 1, j, color_actual);
+            else if( ((i + 1) < alto) && 
+                color_es_negro( imagen_obtener_pixel(tablero, i + 1, j) ) &&  
+                color_es_negro(imagen_obtener_pixel(tablero_nuevo, i + 1, j))){
+                    imagen_establecer_pixel(tablero_nuevo, i + 1, j, color_actual);
+                }
                 
             //intenta mover en diagonales
             else{
 
-                bool izq_libre = (j > 0) && (i+1 < alto) && color_es_negro(imagen_obtener_pixel(tablero, i+1, j-1));
-
-                bool der_libre = (j+1 < ancho) && (i+1 < alto) && color_es_negro(imagen_obtener_pixel(tablero, i+1, j+1));
+                bool izq_libre = (j > 0) && ( (i+1) < alto) && color_es_negro(imagen_obtener_pixel(tablero, i + 1, j - 1)) &&
+                color_es_negro(imagen_obtener_pixel(tablero_nuevo, i + 1, j - 1));
+                bool der_libre = ( (j + 1) < ancho) && ( (i + 1) < alto) && color_es_negro(imagen_obtener_pixel(tablero, i + 1, j + 1)) &&
+                color_es_negro(imagen_obtener_pixel(tablero_nuevo, i + 1, j + 1));
 
                 if(izq_libre && der_libre){
                     if( (rand () % 2) == 0)
                         imagen_establecer_pixel(tablero_nuevo, i + 1, j - 1, color_actual);
                     else
                         imagen_establecer_pixel(tablero_nuevo, i + 1 , j + 1, color_actual);
-                    
-
                 }
 
                 else if(izq_libre)
@@ -136,18 +135,17 @@ void simulacion_arena (imagen_t *tablero){
                     imagen_establecer_pixel(tablero_nuevo, i + 1, j + 1, color_actual);
                 else
                     imagen_establecer_pixel(tablero_nuevo, i , j, color_actual);
-    
             }
         }
     }
     
     for(size_t i = 0; i < alto; i++){
         for(size_t j = 0; j < ancho; j++){
-            color_t c = imagen_obtener_pixel(tablero_nuevo, i, j);
-            imagen_establecer_pixel(tablero,i, j,c);
+            imagen_establecer_pixel(tablero,i, j, imagen_obtener_pixel(tablero_nuevo, i, j));
         }
     }
     imagen_destruir(tablero_nuevo);
+
 }
 
 bool se_genero_linea(size_t alto_tablero, size_t ancho_tablero, imagen_t* tablero, imagen_t* visitados, int fila, int columna, color_t color){
@@ -221,7 +219,7 @@ imagen_t* generar_numeros(char* aux, sprites_t* sprites){
 
         sprite_t* numero = sprites_obtener(sprites, tmp);
         if(numero == NULL){
-            puts("El numero no existe");
+            fprintf(stderr,"El numero no existe");
             printf("%c\n",aux[i]);
             imagen_destruir(contador);
             return NULL;
@@ -248,9 +246,10 @@ imagen_t* generar_numeros(char* aux, sprites_t* sprites){
 }
 
 imagen_t* generar_tiempo(unsigned int ticks, sprites_t* sprites){
-    unsigned char milisegundos = ticks % 1000;
-    char segundos = ticks/1000;
+    
     char minutos = ticks/60000;
+    char segundos = (ticks%60000)/1000;
+    unsigned char milisegundos = ticks % 1000;
 
     char aux[50];
     snprintf(aux,sizeof(aux),"%02d:%02d:%02d",minutos,segundos, milisegundos);
@@ -259,16 +258,14 @@ imagen_t* generar_tiempo(unsigned int ticks, sprites_t* sprites){
 }
 
 void generar_puntaje(unsigned int contador_puntaje, imagen_t** puntos, unsigned int contador_clears, imagen_t** clears, sprites_t* sprites){
+    
     char aux[50];
     
     snprintf(aux,sizeof(aux),"%d",contador_puntaje);
     *puntos = generar_numeros(aux, sprites);
     
-    
-
     snprintf(aux,sizeof(aux),"%d",contador_clears);
     *clears = generar_numeros( aux, sprites);
-    
 
 }
 
@@ -296,6 +293,19 @@ imagen_t* generar_tubo(sprites_t* sprites, color_t color){
     imagen_t* tubo = pieza_crear(color, sprite_tubo);
     return tubo;
 }
+
+imagen_t* crear_tablero_negro(){
+    imagen_t* tablero = imagen_crear(ANCHO_TABLERO,ALTO_TABLERO);
+    if(tablero==NULL){
+        fprintf(stderr,"No se pudo crear tablero en negro\n");
+        return NULL;
+    }
+    for(size_t i=0; i < 144; i++)
+        for(size_t j=0; j < 80; j++)
+            imagen_establecer_pixel(tablero, i, j , 0);
+    return tablero;
+}
+
 
 void desplazamientos(char direccion, size_t* cp, char* desplazamiento_restante){
     *cp = *cp + direccion;
@@ -329,4 +339,15 @@ void aumento_de_velocidad(unsigned int ticks, unsigned int* ticks_previo, unsign
 
     *f_ = *f_ + velocidad_efectiva/JUEGO_FPS;
 
+}
+
+char* dar_pieza_random(){
+    char* piezas[]={"i", "j", "l" , "o" , "s" , "t" , "z"};
+    return piezas[rand()%7];
+}
+
+//opcional 
+void puntaje_en_pantalla(unsigned int contador_puntaje, unsigned int contador_clears){
+    puts("GAME OVER");
+    printf("Puntos totales = %d\nClears = %d\n", contador_puntaje, contador_clears);
 }

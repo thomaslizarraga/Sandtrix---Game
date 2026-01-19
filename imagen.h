@@ -78,7 +78,6 @@ void imagen_establecer_pixel(imagen_t *imag, size_t fil, size_t col,color_t c);
 // 0 <= fil <= imagen_alto - 1        0 <= col <= imagen_ancho - 1      
 color_t imagen_obtener_pixel(const imagen_t *imag, int fil, int col);
 
-imagen_t* crear_tablero_negro();
 
 
 #endif

@@ -31,7 +31,6 @@ int main(int argc, char *argv[]) {
 
 // BEGIN código del alumno
     //debemos cargar todos los componentes del juego
-    //cargo fondo
     FILE *f = fopen("fondo.ppm", "rt");
     if(f==NULL){
         fprintf(stderr,"No se puede abrir el archivo\n");
@@ -55,7 +54,6 @@ int main(int argc, char *argv[]) {
         imagen_destruir(im);
         return 1;
     }
-
     imagen_t *tablero_visitados = crear_tablero_negro();
     if(tablero_visitados==NULL){
         fprintf(stderr,"No se puedo crear tablero de visitados\n");
@@ -63,8 +61,6 @@ int main(int argc, char *argv[]) {
         imagen_destruir(tablero);
         return 1;
     }
-    imagen_t* copia = NULL;
-        
     //fin de inicializar tableros
 
     //cargamos los sprites
@@ -77,15 +73,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // Inicializa la semilla de números aleatorios
+    // inicializa la semilla de números aleatorios
     srand(time(NULL));  
 
-    //establecemos piezas grandes
-    char* piezas[]={"i", "j", "l" , "o" , "s" , "t" , "z"};
     imagen_t* pieza = NULL;
     imagen_t* pieza_siguiente = NULL;
-    imagen_t* miniatura = NULL;
+    imagen_t* miniatura = NULL; 
     imagen_t* tubo = NULL;
+    imagen_t* copia = NULL;
     char color_pieza_siguiente ;
     
     size_t fp = CENTRO_FILA_TABLERO;
@@ -115,10 +110,8 @@ int main(int argc, char *argv[]) {
         sprites_destruir(sprites);
         return 1;
     }
-
     if(clears==NULL){
-        puts("No se puede generar lineas");
-        fprintf(stderr,"No se puede generar puntos\n");
+        fprintf(stderr,"No se puede generar clears\n");
         imagen_destruir(im);
         imagen_destruir(tablero);
         imagen_destruir(tablero_visitados);
@@ -136,14 +129,12 @@ int main(int argc, char *argv[]) {
     bool aceleracion_activada = false;
     unsigned int tiempo_aceleracion = 0;
 
-
 // END código del alumno
 
     unsigned int ticks = SDL_GetTicks();
     while(1) {   
         if(SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT){
-                
                 break;
             }
 //BEGIN código del alumno
@@ -151,11 +142,9 @@ int main(int argc, char *argv[]) {
                 switch(event.key.keysym.sym) {
                    case SDLK_UP: {
                         imagen_t* rotada = imagen_rotar_antihorario(pieza);
-
                         //mantengo centro
                         size_t centro = cp + imagen_ancho(pieza) / 2;
                         cp = centro - imagen_ancho(rotada) / 2;
-
                         //casos de bordes
                         if (cp < LIMITE_BORDE_IZQUIERDO) {
                             cp = POSICION_COLUMNA_TABLERO;
@@ -165,10 +154,8 @@ int main(int argc, char *argv[]) {
                         }
                         imagen_destruir(pieza);
                         pieza = rotada;
-
                         break;
                     }
-
                     case SDLK_DOWN:{
                         if(!aceleracion_activada){
                             aceleracion_activada = true;
@@ -191,11 +178,8 @@ int main(int argc, char *argv[]) {
                         break;
                     }
                 }
-                
             }
-    
  //END código del alumno
- 
             continue;
         }
 
@@ -206,8 +190,7 @@ int main(int argc, char *argv[]) {
 
         //creo una pieza, pero tiene que perdurar
         if(pieza_no_existe(pieza)){
-            char* pieza_etiqueta = piezas[rand()%7];
-            pieza = pieza_crear(dar_color(), sprites_obtener(sprites, pieza_etiqueta) );
+            pieza = pieza_crear(dar_color(), sprites_obtener(sprites, dar_pieza_random() ) );
             if(pieza == NULL){
                 fprintf(stderr,"Está fallando la creacion de la pieza actual\n");
                 break;
@@ -215,14 +198,12 @@ int main(int argc, char *argv[]) {
             cp = CENTRO_COLUMNA_TABLERO - imagen_ancho(pieza)/2;
         }
         //fin de creacion de pieza
-
         //creo una pieza siguiente, pero tiene que perdurar
         if(pieza_no_existe(pieza_siguiente)){
-            char* pieza_etiqueta = piezas[rand()%7];
+            char* pieza_etiqueta = dar_pieza_random();
 
-                    char aux[5];
-                    sprintf(aux,"%sc",pieza_etiqueta);
-
+                    char aux[5]; //estas 4 lineas son para la miniatura
+                    sprintf(aux,"%sc", pieza_etiqueta);
                     imagen_destruir(miniatura);
                     miniatura = generar_miniatura( sprites_obtener(sprites, aux) );
 
@@ -236,7 +217,6 @@ int main(int argc, char *argv[]) {
 
         }
         //fin de creacion de pieza siguiente
-
         tubo = generar_tubo(sprites,color_pieza_siguiente);
         if(tubo == NULL){
             fprintf(stderr,"Está fallando la creacion del tubo\n");
@@ -250,39 +230,8 @@ int main(int argc, char *argv[]) {
                 desplazamiento_restante = 0;
         }
 
-
-
-
-
-
-        //aumento_de_velocidad(ticks, &ticks_previo, &tiempo_aceleracion ,&suma_1_segundos, &velocidad, &f_, &aceleracion_activada);
-        //inicio parte para generar caida con velocidad
-        if (aceleracion_activada) {
-            if (ticks - tiempo_aceleracion >= 333) {
-                aceleracion_activada = false;
-            }
-        }
-        unsigned int dif = ticks - ticks_previo;
-        ticks_previo = ticks;
-        float delta_t = dif/1000.0f;
-        suma_1_segundos = suma_1_segundos + delta_t;
-        if(suma_1_segundos >= 1){
-            velocidad = velocidad + velocidad*0.01;
-            suma_1_segundos = suma_1_segundos - 1;
-        }
-        float velocidad_efectiva = velocidad;
-        if (aceleracion_activada) {
-            velocidad_efectiva *= 5;
-        }
-        f_ = f_ + velocidad_efectiva/JUEGO_FPS;
-        //fin parte para generar caida
+        aumento_de_velocidad(ticks, &ticks_previo, &tiempo_aceleracion ,&suma_1_segundos, &velocidad, &f_, &aceleracion_activada);
         
-
-
-
-
-
-
         if(  (size_t)f_  !=  fp ) {
             
             diferencia_entre_filas = (size_t)f_ - fp;
@@ -291,9 +240,7 @@ int main(int argc, char *argv[]) {
                 if(pieza_toca_arena(pieza,tablero, fp+k, cp-POSICION_COLUMNA_TABLERO)){ //si toca arena o llega al final del tablero
                     
                     pegar_subimagen_tranparencia(tablero, pieza, fp + k, cp - POSICION_COLUMNA_TABLERO);
-
                     imagen_destruir(pieza); 
-                          
                     pegar_subimagen_tranparencia(copia,tablero,POSICION_FILA_TABLERO,POSICION_COLUMNA_TABLERO);
                     
                     fp = CENTRO_FILA_TABLERO;
@@ -306,28 +253,24 @@ int main(int argc, char *argv[]) {
                 }
                 else if ( k == (diferencia_entre_filas - 1) ){
                     pegar_subimagen_tranparencia(copia,tablero,POSICION_FILA_TABLERO,POSICION_COLUMNA_TABLERO);
-                    pegar_subimagen_tranparencia(copia,pieza,fp + k,cp);
+                    pegar_subimagen_tranparencia(copia,pieza, fp + k, cp);
                 }
             }
             if(toque_alto(tablero)){
-                puts("GAME OVER");
                 imagen_destruir(copia);  
                 imagen_destruir(tubo);
-                printf("Puntos totales = %d\nClears = %d\n", contador_puntaje, contador_clears);
+                puntaje_en_pantalla(contador_puntaje, contador_clears); //opcional
                 break;
             }
             fp = f_ ; //actualizo la nueva posición.
         }
-
         //pego cosas en el tablero
-        
         tiempo = generar_tiempo(ticks,sprites);
         pegar_subimagen_tranparencia(copia,tiempo,TIEMPO_FILA, TIEMPO_COLUMNA);
         pegar_subimagen_tranparencia(copia,miniatura, CENTRO_FILA_MINIATURA - imagen_alto(miniatura)/2 , CENTRO_COLUMNA_MINIATURA - imagen_ancho(miniatura)/2);
         pegar_subimagen_tranparencia(copia,tubo,TUBO_FILA,TUBO_COLUMNA);
         pegar_subimagen_tranparencia(copia,puntos,PUNTOS_FILA,PUNTOS_COLUMNA);
         pegar_subimagen_tranparencia(copia,clears, CLEARS_FILA, CLEARS_COLUMNA);
-
         
         //simulo la arena 3 veces 
         for(size_t i = 0; i < CANTIDAD_SIMULACIONES ; i++){
@@ -354,7 +297,6 @@ int main(int argc, char *argv[]) {
                     imagen_destruir(clears); 
                     
                     generar_puntaje(contador_puntaje, &puntos, contador_clears, &clears, sprites);
-
                     }
                 imagen_destruir(tablero_visitados);
                 tablero_visitados = crear_tablero_negro();
@@ -362,7 +304,6 @@ int main(int argc, char *argv[]) {
             
             }
 
-        
         //esto es todo el conjunto: pieza, tablero, fondo, etc. No tocar nada por el momento.
         memset(canvas, 0, VENTANA_ALTO * VENTANA_ANCHO * sizeof(uint32_t));
         for(size_t f = 0; f < imagen_alto(copia); f++)
@@ -381,7 +322,6 @@ int main(int argc, char *argv[]) {
             imagen_destruir(tiempo); 
             imagen_destruir(tubo); 
 
-        
 // END código del alumno
         SDL_UpdateTexture(texture, NULL, canvas, VENTANA_ANCHO * sizeof(uint32_t));
         SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -399,10 +339,8 @@ int main(int argc, char *argv[]) {
         ticks = SDL_GetTicks();
     }
 
-
 // BEGIN código del alumno
     //Destruir todo lo que haya que destruir: tablero, piezas, etc.
-    
     imagen_destruir(im); 
     imagen_destruir(pieza);
     imagen_destruir(pieza_siguiente);
@@ -412,8 +350,7 @@ int main(int argc, char *argv[]) {
     imagen_destruir(miniatura); 
     imagen_destruir(clears);
     sprites_destruir(sprites); 
-
-    puts("Elimine todo");
+    
 // END código del alumno
 
     SDL_DestroyRenderer(renderer);

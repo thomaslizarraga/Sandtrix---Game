@@ -33,11 +33,16 @@ imagen_t* pieza_crear(color_t color, sprite_t* sprite);
 
 imagen_t* generar_tubo(sprites_t* sprites, color_t color);
 
+imagen_t* crear_tablero_negro();
+
 void desplazamientos(char direccion, size_t* cp, char* desplazamiento_restante);
 
 void aumento_de_velocidad(unsigned int ticks, unsigned int* ticks_previo, unsigned int* tiempo_aceleracion,
     float* suma_1_segundos ,float* velocidad, float* f_, 
     bool* aceleracion_activada);
 
+char* dar_pieza_random();
+
+void puntaje_en_pantalla(unsigned int contador_puntaje, unsigned int contador_clears);
 
 #endif

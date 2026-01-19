@@ -276,17 +276,8 @@ color_t imagen_obtener_pixel(const imagen_t *imagen, int fil, int col){
     return imagen->pixeles[fil][col];
 }
 
-imagen_t* crear_tablero_negro(){
-    imagen_t* tablero = imagen_crear(80,144);
-    if(tablero==NULL){
-        fprintf(stderr,"No se pudo crear tablero en negro\n");
-        return NULL;
-    }
-    for(size_t i=0; i < 144; i++)
-        for(size_t j=0; j < 80; j++)
-            tablero->pixeles[i][j] = 0;
-    return tablero;
-}
+
+
 
 
 
